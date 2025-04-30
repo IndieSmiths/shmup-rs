@@ -5,14 +5,14 @@ use sdl2::render::{TextureCreator, WindowCanvas};
 use sdl2::image::InitFlag;
 
 
-pub struct SdlRefs {
+pub struct SdlStructs {
     pub canvas: WindowCanvas,
     pub texture_creator: TextureCreator<WindowContext>,
     pub event_pump: EventPump,
 }
 
 
-pub fn setup_and_get_refs() -> Result<SdlRefs, String> {
+pub fn setup_and_get_structs() -> Result<SdlStructs, String> {
 
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
@@ -58,7 +58,7 @@ pub fn setup_and_get_refs() -> Result<SdlRefs, String> {
     let event_pump = sdl_context.event_pump().unwrap();
 
     Ok (
-        SdlRefs {
+        SdlStructs {
             canvas,
             texture_creator,
             event_pump,

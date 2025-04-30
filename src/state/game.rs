@@ -5,42 +5,30 @@ use std::ops::Not;
 use sdl2::EventPump;
 use sdl2::event::Event;
 use sdl2::keyboard::{Keycode, Scancode};
-use sdl2::render::{WindowCanvas, Texture, TextureQuery};
-use sdl2::rect::Rect;
+use sdl2::render::{WindowCanvas, Texture};
 use sdl2::pixels::Color;
 
 use crate::state::loopholdertrait::LoopHolder;
+use crate::struct2d::Player;
+use crate::gamestruct::GameStruct;
 
 
-struct Object<'a> {
-    texture: &'a Texture<'a>,
-    rect: Rect,
-}
 
 pub struct Game<'a> {
-    game_object: Object<'a>
+    player: Player<'a>
 }
 
 impl<'a> Game<'a> {
 
     pub fn new(texture_map: &'a HashMap<String, Texture>) -> Result<Self, String> {
-
-        let key_string = "ship_0000.png".to_string();
-        let texture = &texture_map.get(&key_string).unwrap();
-
-        let TextureQuery {width, height, .. } = texture.query();
-
-        let rect = Rect::new(100, 100, width, height);
-
-        Ok(Self{ game_object: Object {texture: &texture, rect: rect}})
-
+        Ok(Self{ player: Player::new(&texture_map).unwrap()})
     }
 }
 
 
 impl LoopHolder for Game<'_> {
 
-    fn get_input(&mut self, event_pump: &mut EventPump) -> Result<(), String> {
+    fn get_input(&mut self, event_pump: &mut EventPump, game_struct: &mut GameStruct) -> Result<(), String> {
 
         for event in event_pump.poll_iter() {
 
@@ -66,22 +54,22 @@ impl LoopHolder for Game<'_> {
         if (dx == 0 && dy == 0).not() {
             dx *= 6;
             dy *= 6;
-            self.game_object.rect.offset(dx, dy);
+            self.player.rect.offset(dx, dy);
         }
 
         Ok(())
 
     }
 
-    fn draw(&self, canvas: &mut WindowCanvas) -> Result<(), String> {
+    fn draw(&self, canvas: &mut WindowCanvas, game_struct: &mut GameStruct) -> Result<(), String> {
 
         canvas.set_draw_color(Color::RGB(100, 100, 100));
         canvas.clear();
 
         canvas.copy(
-            &self.game_object.texture,
+            &self.player.texture,
             None,
-            Some(self.game_object.rect)
+            Some(self.player.rect)
         )?;
 
         canvas.present();
