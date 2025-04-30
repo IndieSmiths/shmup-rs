@@ -1,18 +1,20 @@
 
 
-//use crate::struct2d::Struct2D;
+use crate::struct2d::Struct2D;
 
 
-pub struct GameStruct {
-    pub actors: Vec<i32>,
+pub struct GameStruct<'a> {
+    pub actors: Vec<Struct2D<'a>>,
 }
 
-impl GameStruct {
+impl GameStruct<'_> {
 
     pub fn new () -> Self {
+
         Self {
-            actors: vec![1, 2, 3],
+            actors: Vec::new(),
         }
+
     }
 
 }

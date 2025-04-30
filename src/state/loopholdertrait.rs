@@ -23,7 +23,7 @@ pub trait LoopHolder {
     fn draw(
         &self,
         canvas: &mut WindowCanvas,
-        game_struct: &mut GameStruct,
+        game_struct: &GameStruct,
     )-> Result<(), String>;
 
     fn apploop(

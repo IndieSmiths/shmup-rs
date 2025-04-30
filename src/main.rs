@@ -24,9 +24,9 @@ pub fn main() -> Result<(), String> {
 
     let texture_map = get_texture_map(&sdl_structs.texture_creator);
 
-    let mut state_map = get_state_map(&texture_map);
-
     let mut game_struct = GameStruct::new();
+
+    let mut state_map = get_state_map(&texture_map, &mut game_struct);
 
     let State::GameState(state) = state_map.get_mut("game").unwrap();
 

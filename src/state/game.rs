@@ -9,7 +9,7 @@ use sdl2::render::{WindowCanvas, Texture};
 use sdl2::pixels::Color;
 
 use crate::state::loopholdertrait::LoopHolder;
-use crate::struct2d::Player;
+use crate::struct2d::{Player, Struct2D, EnemyA};
 use crate::gamestruct::GameStruct;
 
 
@@ -20,7 +20,12 @@ pub struct Game<'a> {
 
 impl<'a> Game<'a> {
 
-    pub fn new(texture_map: &'a HashMap<String, Texture>) -> Result<Self, String> {
+    pub fn new(texture_map: &'a HashMap<String, Texture>, game_struct: &mut GameStruct<'a>) -> Result<Self, String> {
+
+        let ea = EnemyA::new("center", (400, 400), &texture_map).unwrap();
+        let var = Struct2D::VarEnemyA(ea);
+        game_struct.actors.push(var);
+
         Ok(Self{ player: Player::new(&texture_map).unwrap()})
     }
 }
@@ -61,15 +66,32 @@ impl LoopHolder for Game<'_> {
 
     }
 
-    fn draw(&self, canvas: &mut WindowCanvas, game_struct: &mut GameStruct) -> Result<(), String> {
+    fn draw(&self, canvas: &mut WindowCanvas, game_struct: &GameStruct) -> Result<(), String> {
 
         canvas.set_draw_color(Color::RGB(100, 100, 100));
         canvas.clear();
 
+        for struct2d in &game_struct.actors {
+
+            match struct2d {
+
+                Struct2D::VarEnemyA(ea) => 
+
+                    canvas.copy(
+                        &ea.texture,
+                        None,
+                        Some(ea.rect),
+                    )?
+
+
+            }
+
+        }
+
         canvas.copy(
             &self.player.texture,
             None,
-            Some(self.player.rect)
+            Some(self.player.rect),
         )?;
 
         canvas.present();
