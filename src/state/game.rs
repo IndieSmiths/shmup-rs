@@ -110,8 +110,13 @@ impl LoopHolder for Game<'_> {
     ) -> Result<(), String> {
         
         game_struct.update();
+
+        // TODO  probably create this vector in GameStruct instead,
+        // for continuous reuse;
+
+        let mut indices_to_remove: Vec<usize> = Vec::new();
         
-        for projectile in &mut game_struct.projectiles {
+        for (index, projectile) in &mut game_struct.projectiles.iter_mut().enumerate() {
 
             match projectile {
 
@@ -120,13 +125,19 @@ impl LoopHolder for Game<'_> {
                     shot.update();
 
                     if !game_struct.canvas_rect.has_intersection(shot.rect) {
-                        println!("out");
+                        indices_to_remove.push(index);
                     }
 
                 }
 
             }
 
+        }
+
+        // important to use pop here so we always remove indices from
+        // right to left of vector
+        while let Some(index) = indices_to_remove.pop() {
+            game_struct.projectiles.swap_remove(index);
         }
 
         Ok(())
