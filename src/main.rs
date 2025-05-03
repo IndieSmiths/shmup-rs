@@ -40,6 +40,7 @@ pub fn main() -> Result<(), String> {
                                &mut sdl_structs.event_pump,
                                &mut sdl_structs.canvas,
                                &mut game_struct,
+                               &texture_map,
                            ) {
 
             if text == quit {

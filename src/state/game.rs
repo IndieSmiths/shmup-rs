@@ -1,6 +1,7 @@
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::ops::Not;
+use std::iter::Extend;
 
 use sdl2::EventPump;
 use sdl2::event::Event;
@@ -9,7 +10,9 @@ use sdl2::render::{WindowCanvas, Texture};
 use sdl2::pixels::Color;
 
 use crate::state::loopholdertrait::LoopHolder;
-use crate::struct2d::{Player, Struct2D, EnemyA};
+use crate::struct2d::player::Player;
+use crate::struct2d::actor::{Actors, EnemyA};
+use crate::struct2d::projectile::Projectiles;
 use crate::gamestruct::GameStruct;
 
 
@@ -23,7 +26,7 @@ impl<'a> Game<'a> {
     pub fn new(texture_map: &'a HashMap<String, Texture>, game_struct: &mut GameStruct<'a>) -> Result<Self, String> {
 
         let ea = EnemyA::new("center", (400, 400), &texture_map).unwrap();
-        let var = Struct2D::VarEnemyA(ea);
+        let var = Actors::VarEnemyA(ea);
         game_struct.actors.push(var);
 
         Ok(Self{ player: Player::new(&texture_map).unwrap()})
@@ -33,7 +36,14 @@ impl<'a> Game<'a> {
 
 impl LoopHolder for Game<'_> {
 
-    fn get_input(&mut self, event_pump: &mut EventPump, game_struct: &mut GameStruct) -> Result<(), String> {
+    fn get_input(
+        &mut self,
+        event_pump: &mut EventPump,
+        game_struct: &mut GameStruct,
+        texture_map: &HashMap<String, Texture>,
+    ) -> Result<(), String> {
+
+        // events
 
         for event in event_pump.poll_iter() {
 
@@ -47,14 +57,30 @@ impl LoopHolder for Game<'_> {
 
         }
 
-        let pressed: HashSet<Scancode> = event_pump.keyboard_state().pressed_scancodes().collect();
+        // --- button state ---
+
+        let pressed = &mut game_struct.pressed_keys;
+
+        pressed.extend(event_pump.keyboard_state().pressed_scancodes());
+
+        let (w, a, s, d, j) = (
+            pressed.contains(&Scancode::W),
+            pressed.contains(&Scancode::A),
+            pressed.contains(&Scancode::S),
+            pressed.contains(&Scancode::D),
+            pressed.contains(&Scancode::J),
+        );
+
+        pressed.clear();
+
+        // moving
 
         let (mut dx, mut dy) = (0, 0);
 
-        if pressed.contains(&Scancode::W) {dy -= 1};
-        if pressed.contains(&Scancode::A) {dx -= 1};
-        if pressed.contains(&Scancode::S) {dy += 1};
-        if pressed.contains(&Scancode::D) {dx += 1};
+        if w {dy -= 1};
+        if a {dx -= 1};
+        if s {dy += 1};
+        if d {dx += 1};
 
         if (dx == 0 && dy == 0).not() {
             dx *= 6;
@@ -62,8 +88,30 @@ impl LoopHolder for Game<'_> {
             self.player.rect.offset(dx, dy);
         }
 
+        // shooting
+
+        if j {
+            self.player.shoot(game_struct, &texture_map);
+        }
+
         Ok(())
 
+    }
+
+    fn update(
+        &mut self,
+        game_struct: &mut GameStruct,
+    ) -> Result<(), String> {
+        
+        for projectile in &mut game_struct.projectiles {
+
+            match projectile {
+                Projectiles::VarShot000(shot) => shot.update()
+            }
+
+        }
+
+        Ok(())
     }
 
     fn draw(&self, canvas: &mut WindowCanvas, game_struct: &GameStruct) -> Result<(), String> {
@@ -75,7 +123,7 @@ impl LoopHolder for Game<'_> {
 
             match struct2d {
 
-                Struct2D::VarEnemyA(ea) => 
+                Actors::VarEnemyA(ea) => 
 
                     canvas.copy(
                         &ea.texture,

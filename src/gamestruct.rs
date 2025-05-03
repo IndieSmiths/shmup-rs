@@ -1,11 +1,21 @@
 
+use std::collections::{HashMap, HashSet};
+use std::time::Instant;
 
-use crate::struct2d::Struct2D;
+use sdl2::keyboard::Scancode;
+use sdl2::render::Texture;
+
+use crate::struct2d::actor::Actors;
+use crate::struct2d::projectile::{Projectiles, Shot000};
 
 
 pub struct GameStruct<'a> {
-    pub actors: Vec<Struct2D<'a>>,
+    pub actors: Vec<Actors<'a>>,
+    pub projectiles: Vec<Projectiles<'a>>,
+    pub pressed_keys: HashSet<Scancode>,
+    pub shoot_cooldown: Option<Instant>,
 }
+
 
 impl GameStruct<'_> {
 
@@ -13,8 +23,42 @@ impl GameStruct<'_> {
 
         Self {
             actors: Vec::new(),
+            projectiles: Vec::new(),
+            pressed_keys: HashSet::new(),
+            shoot_cooldown: None,
         }
 
+    }
+
+    pub fn update(&mut self) {
+
+        if let Some(instant) = self.shoot_cooldown {
+
+            if instant.elapsed().as_millis() > 300 {
+                self.shoot_cooldown = None;
+            }
+
+        }
+
+    }
+
+    pub fn request_shoot(
+        &mut self,
+        center: (i32, i32),
+        texture_map: &HashMap<String, Texture>,
+    ) {
+
+        if let None = self.shoot_cooldown {
+
+            let coordinates_name = "midbottom";
+            let shot = Shot000::new(&coordinates_name, center, texture_map).unwrap();
+            let shotvar = Projectiles::VarShot000(shot);
+
+            self.projectiles.push(shotvar);
+
+            self.shoot_cooldown = Some(Instant::now());
+
+        }
     }
 
 }
