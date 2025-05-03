@@ -17,7 +17,7 @@ pub struct GameStruct<'a> {
 }
 
 
-impl GameStruct<'_> {
+impl<'a> GameStruct<'a> {
 
     pub fn new () -> Self {
 
@@ -44,14 +44,14 @@ impl GameStruct<'_> {
 
     pub fn request_shoot(
         &mut self,
-        center: (i32, i32),
-        texture_map: &HashMap<String, Texture>,
+        midbottom: (i32, i32),
+        texture_map: &'a HashMap<String, Texture<'a>>,
     ) {
 
         if let None = self.shoot_cooldown {
 
             let coordinates_name = "midbottom";
-            let shot = Shot000::new(&coordinates_name, center, texture_map).unwrap();
+            let shot = Shot000::new(&coordinates_name, midbottom, texture_map).unwrap();
             let shotvar = Projectiles::VarShot000(shot);
 
             self.projectiles.push(shotvar);

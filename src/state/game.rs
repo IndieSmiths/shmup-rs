@@ -36,11 +36,11 @@ impl<'a> Game<'a> {
 
 impl LoopHolder for Game<'_> {
 
-    fn get_input(
+    fn get_input<'a>(
         &mut self,
         event_pump: &mut EventPump,
-        game_struct: &mut GameStruct,
-        texture_map: &HashMap<String, Texture>,
+        game_struct: &mut GameStruct<'a>,
+        texture_map: &'a HashMap<String, Texture<'a>>,
     ) -> Result<(), String> {
 
         // events
@@ -91,7 +91,13 @@ impl LoopHolder for Game<'_> {
         // shooting
 
         if j {
-            self.player.shoot(game_struct, &texture_map);
+
+            let midbottom = (
+                self.player.rect.center().x(),
+                self.player.rect.top(),
+            );
+
+            game_struct.request_shoot(midbottom ,&texture_map);
         }
 
         Ok(())

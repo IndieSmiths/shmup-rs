@@ -4,8 +4,6 @@ use std::collections::HashMap;
 use sdl2::render::{Texture, TextureQuery};
 use sdl2::rect::Rect;
 
-use crate::gamestruct::GameStruct;
-
 
 pub struct Player<'a> {
     pub texture: &'a Texture<'a>,
@@ -26,19 +24,6 @@ impl<'a> Player<'a> {
         Ok(
             Self{texture: &texture, rect: rect}
         )
-
-    }
-
-    pub fn shoot(
-        &self,
-        game_struct: &mut GameStruct,
-        texture_map: &'a HashMap<String, Texture>
-    ) {
-
-        game_struct.request_shoot(
-            (self.rect.center().x(), self.rect.y()),
-            &texture_map,
-        );
 
     }
 

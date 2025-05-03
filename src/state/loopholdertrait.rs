@@ -10,11 +10,11 @@ use crate::gamestruct::GameStruct;
 
 pub trait LoopHolder {
 
-    fn get_input(
+    fn get_input<'a>(
         &mut self,
         event_pump: &mut EventPump,
-        game_struct: &mut GameStruct,
-        texture_map: &HashMap<String, Texture>,
+        game_struct: &mut GameStruct<'a>,
+        texture_map: &'a HashMap<String, Texture<'a>>,
     ) -> Result<(), String>;
 
     fn update(
@@ -30,12 +30,12 @@ pub trait LoopHolder {
         game_struct: &GameStruct,
     )-> Result<(), String>;
 
-    fn apploop(
+    fn apploop<'a>(
         &mut self,
         event_pump: &mut EventPump,
         canvas: &mut WindowCanvas,
-        game_struct: &mut GameStruct,
-        texture_map: &HashMap<String, Texture>,
+        game_struct: &mut GameStruct<'a>,
+        texture_map: &'a HashMap<String, Texture<'a>>,
     ) -> Result<(), String> {
 
         self.get_input(event_pump, game_struct, texture_map)?;
