@@ -4,12 +4,14 @@ use std::time::Instant;
 
 use sdl2::keyboard::Scancode;
 use sdl2::render::Texture;
+use sdl2::rect::Rect;
 
 use crate::struct2d::actor::Actors;
 use crate::struct2d::projectile::{Projectiles, Shot000};
 
 
 pub struct GameStruct<'a> {
+    pub canvas_rect: Rect,
     pub actors: Vec<Actors<'a>>,
     pub projectiles: Vec<Projectiles<'a>>,
     pub pressed_keys: HashSet<Scancode>,
@@ -19,9 +21,10 @@ pub struct GameStruct<'a> {
 
 impl<'a> GameStruct<'a> {
 
-    pub fn new () -> Self {
+    pub fn new ((canvas_width, canvas_height): (u32, u32)) -> Self {
 
         Self {
+            canvas_rect: Rect::new(0, 0, canvas_width, canvas_height),
             actors: Vec::new(),
             projectiles: Vec::new(),
             pressed_keys: HashSet::new(),

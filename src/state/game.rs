@@ -12,7 +12,7 @@ use sdl2::pixels::Color;
 use crate::state::loopholdertrait::LoopHolder;
 use crate::struct2d::player::Player;
 use crate::struct2d::actor::{Actors, EnemyA};
-use crate::struct2d::projectile::Projectiles;
+use crate::struct2d::projectile::{Projectiles, Shot000};
 use crate::gamestruct::GameStruct;
 
 
@@ -109,10 +109,22 @@ impl LoopHolder for Game<'_> {
         game_struct: &mut GameStruct,
     ) -> Result<(), String> {
         
+        game_struct.update();
+        
         for projectile in &mut game_struct.projectiles {
 
             match projectile {
-                Projectiles::VarShot000(shot) => shot.update()
+
+                Projectiles::VarShot000(shot) => {
+
+                    shot.update();
+
+                    if !game_struct.canvas_rect.has_intersection(shot.rect) {
+                        println!("out");
+                    }
+
+                }
+
             }
 
         }
@@ -135,6 +147,23 @@ impl LoopHolder for Game<'_> {
                         &ea.texture,
                         None,
                         Some(ea.rect),
+                    )?
+
+
+            }
+
+        }
+
+        for struct2d in &game_struct.projectiles {
+
+            match struct2d {
+
+                Projectiles::VarShot000(shot) => 
+
+                    canvas.copy(
+                        &shot.texture,
+                        None,
+                        Some(shot.rect),
                     )?
 
 

@@ -7,14 +7,14 @@ mod struct2d;
 
 use std::time::Duration;
 
-use sdlsetup::setup_and_get_structs;
+use crate::sdlsetup::setup_and_get_structs;
 
-use texturemap::get_texture_map;
+use crate::texturemap::get_texture_map;
 
-use gamestruct::GameStruct;
+use crate::gamestruct::GameStruct;
 
-use state::{State, get_state_map};
-use state::loopholdertrait::LoopHolder;
+use crate::state::{State, get_state_map};
+use crate::state::loopholdertrait::LoopHolder;
 
 
 
@@ -24,7 +24,7 @@ pub fn main() -> Result<(), String> {
 
     let texture_map = get_texture_map(&sdl_structs.texture_creator);
 
-    let mut game_struct = GameStruct::new();
+    let mut game_struct = GameStruct::new(sdl_structs.canvas.logical_size());
 
     let mut state_map = get_state_map(&texture_map, &mut game_struct);
 
