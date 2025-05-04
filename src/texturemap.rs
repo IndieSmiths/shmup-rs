@@ -11,7 +11,11 @@ pub fn get_texture_map<'a> (texture_creator: &'a TextureCreator<WindowContext>) 
 
     let mut texture_map: HashMap<String, Texture> = HashMap::new();
 
-    let directory = Path::new("src/data/images");
+    let directory = Path::new(file!())
+                        .parent()
+                        .unwrap()
+                        .join("data")
+                        .join("images");
 
     for entry in directory.read_dir().expect("read_dir call failed") {
 
