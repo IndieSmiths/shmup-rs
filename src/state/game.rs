@@ -12,7 +12,7 @@ use sdl2::pixels::Color;
 use crate::state::loopholdertrait::LoopHolder;
 use crate::struct2d::player::Player;
 use crate::struct2d::actor::{Actors, EnemyA};
-use crate::struct2d::projectile::{Projectiles, Shot000};
+use crate::struct2d::projectile::Projectiles;
 use crate::gamestruct::GameStruct;
 
 
@@ -25,7 +25,7 @@ impl<'a> Game<'a> {
 
     pub fn new(texture_map: &'a HashMap<String, Texture>, game_struct: &mut GameStruct<'a>) -> Result<Self, String> {
 
-        let ea = EnemyA::new("center", (400, 400), &texture_map).unwrap();
+        let ea = EnemyA::new("center", (450, 100), &texture_map).unwrap();
         let var = Actors::VarEnemyA(ea);
         game_struct.actors.push(var);
 
@@ -104,19 +104,21 @@ impl LoopHolder for Game<'_> {
 
     }
 
-    fn update(
+    fn update<'a>(
         &mut self,
-        game_struct: &mut GameStruct,
+        game_struct: &mut GameStruct<'a>,
+        texture_map: &'a HashMap<String, Texture<'a>>,
     ) -> Result<(), String> {
         
         game_struct.update();
 
-        // TODO  probably create this vector in GameStruct instead,
+        // TODO  probably create these vectors in GameStruct instead,
         // for continuous reuse;
 
-        let mut indices_to_remove: Vec<usize> = Vec::new();
+        let mut projectile_indices_to_remove: Vec<usize> = Vec::new();
+        let mut actor_indices_to_remove: Vec<usize> = Vec::new();
         
-        for (index, projectile) in &mut game_struct.projectiles.iter_mut().enumerate() {
+        for (p_index, projectile) in &mut game_struct.projectiles.iter_mut().enumerate() {
 
             match projectile {
 
@@ -125,7 +127,28 @@ impl LoopHolder for Game<'_> {
                     shot.update();
 
                     if !game_struct.canvas_rect.has_intersection(shot.rect) {
-                        indices_to_remove.push(index);
+
+                        projectile_indices_to_remove.push(p_index);
+
+                    } else {
+
+                        for (a_index, actor)
+                        in &mut game_struct.actors.iter_mut().enumerate() {
+
+                            match actor {
+
+                                Actors::VarEnemyA(ea) => {
+
+                                    if shot.rect.has_intersection(ea.rect) {
+
+                                        actor_indices_to_remove.push(a_index);
+
+                                    }
+                                }
+
+                            }
+                        }
+
                     }
 
                 }
@@ -134,10 +157,37 @@ impl LoopHolder for Game<'_> {
 
         }
 
-        // important to use pop here so we always remove indices from
-        // right to left of vector
-        while let Some(index) = indices_to_remove.pop() {
+        // important to use pop in "while let" blocks below so we always
+        // remove indices from right to left of vector
+
+        while let Some(index) = projectile_indices_to_remove.pop() {
             game_struct.projectiles.swap_remove(index);
+        }
+
+        let must_add_new = !actor_indices_to_remove.is_empty();
+
+        while let Some(index) = actor_indices_to_remove.pop() {
+            game_struct.actors.swap_remove(index);
+        }
+
+        if must_add_new {
+
+            let (left, width) = (
+                game_struct.action_rect.left() as u128,
+                game_struct.action_rect.width() as u128,
+            );
+
+            let enemy_x =
+                game_struct
+                    .pseudo_randomizer
+                    .elapsed()
+                    .as_millis()
+                % width
+                + left;
+
+            let ea = EnemyA::new("center", (enemy_x as i32, 100), &texture_map).unwrap();
+            let var = Actors::VarEnemyA(ea);
+            game_struct.actors.push(var);
         }
 
         Ok(())
@@ -145,7 +195,7 @@ impl LoopHolder for Game<'_> {
 
     fn draw(&self, canvas: &mut WindowCanvas, game_struct: &GameStruct) -> Result<(), String> {
 
-        canvas.set_draw_color(Color::RGB(100, 100, 100));
+        canvas.set_draw_color(Color::RGB(120, 150, 200));
         canvas.clear();
 
         for struct2d in &game_struct.actors {
@@ -187,6 +237,10 @@ impl LoopHolder for Game<'_> {
             None,
             Some(self.player.rect),
         )?;
+
+        canvas.set_draw_color(Color::RGB(100, 100, 100));
+        canvas.fill_rect(Some(game_struct.left_column_rect))?;
+        canvas.fill_rect(Some(game_struct.right_column_rect))?;
 
         canvas.present();
 

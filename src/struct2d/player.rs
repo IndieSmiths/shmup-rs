@@ -19,7 +19,7 @@ impl<'a> Player<'a> {
 
         let TextureQuery {width, height, .. } = texture.query();
 
-        let rect = Rect::new(100, 100, width, height);
+        let rect = Rect::new(450, 400, width, height);
 
         Ok(
             Self{texture: &texture, rect: rect}

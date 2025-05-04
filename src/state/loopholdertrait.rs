@@ -17,9 +17,10 @@ pub trait LoopHolder {
         texture_map: &'a HashMap<String, Texture<'a>>,
     ) -> Result<(), String>;
 
-    fn update(
+    fn update<'a>(
         &mut self,
-        game_struct: &mut GameStruct,
+        game_struct: &mut GameStruct<'a>,
+        texture_map: &'a HashMap<String, Texture<'a>>,
     ) -> Result<(), String> {
         Ok(())
     }
@@ -39,7 +40,7 @@ pub trait LoopHolder {
     ) -> Result<(), String> {
 
         self.get_input(event_pump, game_struct, texture_map)?;
-        self.update(game_struct)?;
+        self.update(game_struct, texture_map)?;
         self.draw(canvas, game_struct)?;
 
         Ok(())

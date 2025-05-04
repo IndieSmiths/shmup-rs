@@ -12,10 +12,14 @@ use crate::struct2d::projectile::{Projectiles, Shot000};
 
 pub struct GameStruct<'a> {
     pub canvas_rect: Rect,
+    pub action_rect: Rect,
+    pub left_column_rect: Rect,
+    pub right_column_rect: Rect,
     pub actors: Vec<Actors<'a>>,
     pub projectiles: Vec<Projectiles<'a>>,
     pub pressed_keys: HashSet<Scancode>,
     pub shoot_cooldown: Option<Instant>,
+    pub pseudo_randomizer: Instant,
 }
 
 
@@ -23,12 +27,42 @@ impl<'a> GameStruct<'a> {
 
     pub fn new ((canvas_width, canvas_height): (u32, u32)) -> Self {
 
+        let action_width = (canvas_height / 3) * 4;
+
+        let canvas_rect = Rect::new(0, 0, canvas_width, canvas_height);
+
+        let action_rect = Rect::from_center(
+                            canvas_rect.center(),
+                            action_width,
+                            canvas_height,
+                          );
+
+        let left_column_rect = Rect::new(
+                                 0,
+                                 0,
+                                 action_rect.x() as u32,
+                                 canvas_height,
+                               );
+
+        let right_column_rect = Rect::new(
+                                  action_rect.right(),
+                                  0,
+                                  left_column_rect.width(),
+                                  canvas_height,
+                                );
+
         Self {
-            canvas_rect: Rect::new(0, 0, canvas_width, canvas_height),
+
+            canvas_rect,
+            action_rect,
+            left_column_rect,
+            right_column_rect,
+
             actors: Vec::new(),
             projectiles: Vec::new(),
             pressed_keys: HashSet::new(),
             shoot_cooldown: None,
+            pseudo_randomizer: Instant::now(),
         }
 
     }

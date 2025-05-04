@@ -4,8 +4,6 @@ use std::collections::HashMap;
 use sdl2::render::{Texture, TextureQuery};
 use sdl2::rect::Rect;
 
-use crate::gamestruct::GameStruct;
-
 
 pub struct Shot000<'a> {
     pub texture: &'a Texture<'a>,
@@ -40,7 +38,7 @@ impl<'a> Shot000<'a> {
     }
 
     pub fn update(&mut self) {
-        self.rect.offset(0, -10);
+        self.rect.offset(0, -16);
     }
 }
 
