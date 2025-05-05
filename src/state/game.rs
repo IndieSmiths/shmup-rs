@@ -14,6 +14,7 @@ use crate::struct2d::player::Player;
 use crate::struct2d::actor::{Actors, EnemyA};
 use crate::struct2d::projectile::Projectiles;
 use crate::gamestruct::GameStruct;
+use crate::rectutils::clamp_to_area;
 
 
 
@@ -83,9 +84,12 @@ impl LoopHolder for Game<'_> {
         if d {dx += 1};
 
         if (dx == 0 && dy == 0).not() {
+
             dx *= 6;
             dy *= 6;
             self.player.rect.offset(dx, dy);
+
+            clamp_to_area(&mut self.player.rect, &game_struct.action_rect);
         }
 
         // shooting
@@ -185,9 +189,12 @@ impl LoopHolder for Game<'_> {
                 % width
                 + left;
 
-            let ea = EnemyA::new("center", (enemy_x as i32, 100), &texture_map).unwrap();
+            let mut ea = EnemyA::new("center", (enemy_x as i32, 100), &texture_map).unwrap();
+            clamp_to_area(&mut ea.rect, &game_struct.action_rect);
+
             let var = Actors::VarEnemyA(ea);
             game_struct.actors.push(var);
+
         }
 
         Ok(())

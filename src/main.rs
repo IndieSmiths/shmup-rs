@@ -4,6 +4,7 @@ mod texturemap;
 mod state;
 mod gamestruct;
 mod struct2d;
+mod rectutils;
 
 use std::time::Duration;
 
