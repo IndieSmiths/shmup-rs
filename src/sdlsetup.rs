@@ -1,9 +1,7 @@
-
 use sdl2::EventPump;
-use sdl2::video::WindowContext;
-use sdl2::render::{TextureCreator, WindowCanvas};
 use sdl2::image::InitFlag;
-
+use sdl2::render::{TextureCreator, WindowCanvas};
+use sdl2::video::WindowContext;
 
 pub struct SdlStructs {
     pub canvas: WindowCanvas,
@@ -11,9 +9,7 @@ pub struct SdlStructs {
     pub event_pump: EventPump,
 }
 
-
 pub fn setup_and_get_structs() -> Result<SdlStructs, String> {
-
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
@@ -41,7 +37,8 @@ pub fn setup_and_get_structs() -> Result<SdlStructs, String> {
 
     // */
 
-    let window = video_subsystem.window("Shmup", 1920, 1080)
+    let window = video_subsystem
+        .window("Shmup", 1920, 1080)
         .position_centered()
         .build()
         .unwrap();
@@ -57,12 +54,9 @@ pub fn setup_and_get_structs() -> Result<SdlStructs, String> {
 
     let event_pump = sdl_context.event_pump().unwrap();
 
-    Ok (
-        SdlStructs {
-            canvas,
-            texture_creator,
-            event_pump,
-        }
-    )
-
+    Ok(SdlStructs {
+        canvas,
+        texture_creator,
+        event_pump,
+    })
 }

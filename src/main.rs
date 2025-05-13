@@ -1,10 +1,9 @@
-
-mod sdlsetup;
-mod texturemap;
-mod state;
 mod gamestruct;
-mod struct2d;
 mod rectutils;
+mod sdlsetup;
+mod state;
+mod struct2d;
+mod texturemap;
 
 use std::time::Duration;
 
@@ -14,13 +13,10 @@ use crate::texturemap::get_texture_map;
 
 use crate::gamestruct::GameStruct;
 
-use crate::state::{State, get_state_map};
 use crate::state::loopholdertrait::LoopHolder;
-
-
+use crate::state::{State, get_state_map};
 
 pub fn main() -> Result<(), String> {
-
     let mut sdl_structs = setup_and_get_structs().unwrap();
 
     let texture_map = get_texture_map(&sdl_structs.texture_creator);
@@ -34,24 +30,19 @@ pub fn main() -> Result<(), String> {
     let quit = "quit".to_string();
 
     loop {
-
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
 
         if let Err(text) = state.apploop(
-                               &mut sdl_structs.event_pump,
-                               &mut sdl_structs.canvas,
-                               &mut game_struct,
-                               &texture_map,
-                           ) {
-
+            &mut sdl_structs.event_pump,
+            &mut sdl_structs.canvas,
+            &mut game_struct,
+            &texture_map,
+        ) {
             if text == quit {
                 break;
             }
-
         }
-
     }
 
     Ok(())
-
 }
